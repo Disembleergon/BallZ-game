@@ -16,19 +16,17 @@ self.addEventListener("install", event => {
 self.addEventListener("fetch", event => {
 
     event.respondWith(
-
-        caches.match(event.request).then(r => {
-
-            return r || fetch(event.request).then(response => {
-
-                caches.open(cacheName).then(cache => {
-                    cache.put(event.request, response.clone())
-                })
+        caches.open(cacheName).then(function (cache) {
+          return cache.match(event.request).then(function (response) {
+            return (
+              response ||
+              fetch(event.request).then(function (response) {
+                cache.put(event.request, response.clone());
                 return response;
-            })
-
-        })
-
-    )
+              })
+            );
+          });
+        }),
+      );
 
 })
